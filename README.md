@@ -378,7 +378,7 @@ unrar-here2() {
 Here's how this would work to extract common video filetypes
 
 ~~~bash
-unrar-here "mkv,mp4,avi"
+unrar-here2 "mkv,mp4,avi"
 ~~~
 
 Extract an archive file by running the correct command base on the filename extension
