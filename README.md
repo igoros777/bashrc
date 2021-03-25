@@ -2,7 +2,7 @@
 
 Some of the useful (more or less) aliases and functions for the .bashrc file to make your life a little easier and delay the onset of carpal tunnel syndrome.
 
-Things to remove from .bashrc
+## Things to remove from .bashrc
 
 Few things annoy me more than these three default command aliases. Removing them is one of the first things I do after installing a new OS:
 
@@ -12,10 +12,11 @@ alias mv='mv -i'
 alias rm='rm -i'
 ~~~
 
-Command History
+## Command History
 
 Adding a timestamp to your shell command history is a must. This will help you figure out not just what stupid mistake you made, but also when you made it.
 
+~~~bash
 export HISTTIMEFORMAT='| %F %T | '
 export HISTSIZE=30000
 export HISTCONTROL=ignoredups
@@ -78,88 +79,88 @@ range_minute() {
     done | sed 's/|$//g')"
 }
 history | range_minute "Mar 18 07:24" "Mar 18 08:54"
+~~~
 
-# ----------------------------------------------------------------------------
-# Add this function to your .bashrc to show the top 25 most frequently typed
-# commands that are less than 20 characters and don't span multiple lines:
-# ----------------------------------------------------------------------------
+Add this function to your .bashrc to show the top 25 most frequently typed commands that are less than 20 characters and don't span multiple lines:
+
+~~~bash
 fc() {
     egrep -v "\\\(\s)?$" | awk '{ s = ""; for (i = 6; i <= NF; i++) s = s $i " "; print s }' | sed 's/ /:/g' | awk 'length($0) < 20 { a[$0]++ } END { for ( i in a ) print a[i], i | "sort -rn | head -n25"}' | awk '$1 > max{ max=$1} { bar=""; i=s=10*$1/max;while(i-->0)bar=bar"*"; printf "%25s %15d %s %s", $2, $1,bar, "\n"; }' | sed 's/:/ /g'
 }
 history | fc
+~~~
 
-# ----------------------------------------------------------------------------
-# Combine the previous `fc` function with the `range_hour` function to get a
-# list of most frequently typed commands in the past 3 hours:
-# ----------------------------------------------------------------------------
+Combine the previous `fc` function with the `range_hour` function to get a list of most frequently typed commands in the past 3 hours:
+
+~~~bash
 history | range_hour "$(date -d'-3 hours' +'%b %e %H')" "$(date +'%b %e %H')" | fc
-
+~~~
 
 The `fzf` command-line fuzzy search utility is tremendously useful for search your shell history for commands the syntax of which you can't quite recall. You can find the simple installation instructions here and then add this handy alias to your `.bashrc`:
 
+~~~bash
 alias h='history | fzf'
+~~~
 
-Common Command Aliases
+## Common Command Aliases
 
 Some of the other handy command aliases that I use frequently:
 
-# ----------------------------------------------------------------------------
-# The `fc` function I mentioned earlier can help you determine which commands
-# you type most often. Some of those minght be good candidates for an alias.
-# ----------------------------------------------------------------------------
+The `fc` function I mentioned earlier can help you determine which commands you type most often. Some of those minght be good candidates for an alias.
+~~~bash
 alias g="grep -i"
 alias psg='ps -ef | grep '
+~~~
 
-# ----------------------------------------------------------------------------
-# This produces output similar to `df -hP` but a little easier to follow
-# ----------------------------------------------------------------------------
+This produces output similar to `df -hP` but a little easier to follow
+
+~~~bash
 alias ddf='df -hP | column -t'
+~~~
 
-# ----------------------------------------------------------------------------
-# This are probably the two most useful aliases for the `ls` command
-# ----------------------------------------------------------------------------
+This are probably the two most useful aliases for the `ls` command
+~~~bash
 alias l='ls -CF --color=always'
 alias ll='ls -alhF --color=always'
+~~~
 
-# ----------------------------------------------------------------------------
-# This alias for the `cd` command will follow symlinks to the target location.
-# Many people just alias `cd` to use this syntax.
-# ----------------------------------------------------------------------------
+This alias for the `cd` command will follow symlinks to the target location. Many people just alias `cd` to use this syntax.
+
+~~~bash
 alias ccd='cd -P'
+~~~
 
-# ----------------------------------------------------------------------------
-# Just a quick way to skip typing `cd` altogether for the most common
-# scenarios
-# ----------------------------------------------------------------------------
+Just a quick way to skip typing `cd` altogether for the most common scenarios
+
+~~~bash
 alias ..='cd ..'
 alias ...='cd ../../'
+~~~
 
-# ----------------------------------------------------------------------------
-# I don't normally use `nano`, but here is an alias sysadmins would find
-# useful. It disabled long line wrapping, converts tabs to spaces, and sets
-# the width of a tab to 2 columns instead of the default 8.
-# ----------------------------------------------------------------------------
+I don't normally use `nano`, but here is an alias sysadmins would find useful. It disabled long line wrapping, converts tabs to spaces, and sets the width of a tab to 2 columns instead of the default 8.
+
+~~~bash
 alias nano='nano -wET 2'
+~~~
 
-# ----------------------------------------------------------------------------
-# If you're a fan of `tmux`, which I am, then a few simple aliases will can
-# save you a lot of typing over time
-# ----------------------------------------------------------------------------
+If you're a fan of `tmux`, which I am, then a few simple aliases will can save you a lot of typing over time
 
+~~~bash
 alias tn='tmux new-session -s'                                # tmux new session
 alias ta='tmux attach -t'                                     # tmux attach session
 alias tl='tmux ls'                                            # list serrions
 alias tk='tmux kill-session -s'                               # kill session 
+~~~
 
-# ----------------------------------------------------------------------------
-# Generate a strong password
-# ----------------------------------------------------------------------------
+Generate a strong password
+
+~~~bash
 alias newpass="cat /dev/urandom | tr -dc 'a-zA-Z0-9^#@_:|<>{}=+$%' | fold -w ${1:-32} | head -n 1"
+~~~
 
-# ----------------------------------------------------------------------------
-# Securely delete a file. There are better and faster tools, but this will
-# work in a pinch.
-# ----------------------------------------------------------------------------
+Securely delete a file. There are better and faster tools, but this will work in a pinch.
+
+~~~bash
 filewipe() {
   p="${1}"
   f="${2}"
@@ -178,10 +179,11 @@ filewipe() {
 }
 # Example:
 filewipe 3 /var/log/messages.1
+~~~
 
-# ----------------------------------------------------------------------------
-# My favorite `ssh` alias for running commands on remote servers as root
-# ----------------------------------------------------------------------------
+My favorite `ssh` alias for running commands on remote servers as root
+
+~~~bash
 3s() {
   h="${1}"
   u="${2}"
@@ -192,11 +194,13 @@ filewipe 3 /var/log/messages.1
 }
 # Example:
 3s ncc1701 root "df -hlP"
+~~~
 
-System Management Shortcuts
+## System Management Shortcuts
 
 This is a short list of aliases and functions I have in my `.bashrc` for everyday sysadmin tasks.
 
+~~~bash
 # Show total allocated local disk space
 dfalloc() {
   df -klP -t xfs -t ext2 -t ext3 -t ext4 -t reiserfs | \
@@ -252,24 +256,26 @@ fswatch /var/log "*" 10 20
 
 # Find the number of physical CPUs (even if hyper-threading is enabled)
 alias corecount="lscpu -p | egrep -v '^#' | sort -u -t, -k 2,4 | wc -l"
+~~~
 
-Correcting Typos
+## Correcting Typos
 
 There are certain commands I mistype on a regular basis. While `.bashrc` is not the best way of addressing this issue ( for this I would recommend using AutoHotkey on Windows or AutoKey on Linux), but to a limited extent it's not a terrible idea:
 
+~~~bash
 alias grpe='grep'
 alias hsitory='history'
 alias sl='ls'
 alias cd..='cd ..'
+~~~
 
-Copying, Syncing, and Archiving Data
+## Copying, Syncing, and Archiving Data
 
 The joke about typing a useful `tar ` command without googling has some truth to it. The same goes for `rsync`, `dd`, and even the good old `cp`. Here are some relevant aliases from my `.bashrc`:
 
-# ----------------------------------------------------------------------------
-# A function to create a compressed tarball of a directory in the current
-# folder, if there's sufficient space
-# ----------------------------------------------------------------------------
+A function to create a compressed tarball of a directory in the current folder, if there's sufficient space
+
+~~~bash
 targz() {
   d="${1}"
   if [ -d "${d}" ]
@@ -284,14 +290,17 @@ targz() {
     echo "Can't access ${d}"
   fi
 }
+~~~
 
-# Running this will then produce folder.tgz in your home directory
+Running this will then produce folder.tgz in your home directory
+
+~~~bash
 cd ~ && targz folder
+~~~
 
-# ----------------------------------------------------------------------------
-# The following function would rsync stuff from the specified source to the
-# target with all the common and useful options.
-# ----------------------------------------------------------------------------
+The following function would rsync stuff from the specified source to the target with all the common and useful options.
+
+~~~bash
 myrsync() {
   s="${1}"
   t="${2}"
@@ -314,14 +323,17 @@ myrsync() {
     echo "Can't access ${s}"
   fi
 }
+~~~
 
-# An example of how to run the `myrsync` function:
+An example of how to run the `myrsync` function:
+
+~~~bash
 myrsync /etc /opt/backups/$(date +'%Y-%m-%d_%H%M%S')
+~~~
 
-# ----------------------------------------------------------------------------
-# Here's a function to find files in the source directory that
-# match the specified filename mask and rsync them to another folder:
-# ----------------------------------------------------------------------------
+Here's a function to find files in the source directory that match the specified filename mask and rsync them to another folder:
+
+~~~bash
 find-rsync() {
   s="${1}"
   t="${2}"
@@ -339,14 +351,17 @@ find-rsync() {
     echo "Can't access ${s} or filename mask is not set"
   fi
 }
+~~~
 
-# An example of how to run the `find-rsync` function to copy all `*.conf` files from /etc to a backup folder:
+An example of how to run the `find-rsync` function to copy all `*.conf` files from /etc to a backup folder:
+
+~~~bash
 find-rsync /etc /opt/backups/$(date +'%Y-%m-%d_%H%M%S') "*\.conf"
+~~~
 
-# ----------------------------------------------------------------------------
-# Find all RAR archives in the current folder and extract only certain
-# types of files from them:
-# ----------------------------------------------------------------------------
+Find all RAR archives in the current folder and extract only certain types of files from them:
+
+~~~bash
 unrar-here2() {
   t="${1}"
   if [ ! -z "${t}" ]
@@ -358,14 +373,17 @@ unrar-here2() {
     done) \;
   fi
 }
+~~~
 
-# Here's how this would work to extract common video filetypes
+Here's how this would work to extract common video filetypes
+
+~~~bash
 unrar-here "mkv,mp4,avi"
+~~~
 
-# ----------------------------------------------------------------------------
-# Extract an archive file by running the correct command base on the
-# filename extension
-# ----------------------------------------------------------------------------
+Extract an archive file by running the correct command base on the filename extension
+
+~~~bash
 extract () {
   if [ -f "${1}" ] ; then
     case $1 in
@@ -385,10 +403,14 @@ extract () {
     echo "Can't access ${1}"
   fi
 }
-Handy Network Aliases
+
+~~~
+
+## Handy Network Aliases
 
 I may not need to use these often, but when I do, I am usually in a hurry and have no time for googling.
 
+~~~bash
 # Show local primary IP address
 alias localip='ifconfig | sed -rn "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
 
@@ -444,3 +466,4 @@ localports() {
     lsof -i :${i} | grep -v COMMAND | awk -v i=$i '{print $1,$3,i}' | sort -u
   done | column -t
 }
+~~~
