@@ -283,3 +283,262 @@ alias h='history | fzf'
 [[ -s /root/.autojump/etc/profile.d/autojump.sh ]] && \
 source /root/.autojump/etc/profile.d/autojump.sh
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Copying, Syncing, and Archiving Data                                        |
+# |The joke about typing a useful tar command without googling has some        |
+# |truth to it. The same goes for rsync, dd, and even the good old cp. Here    |
+# |are some relevant aliases from my .bashrc:                                  |
+# +---------------------------------------------------------------------------*/
+# ----------------------------------------------------------------------------
+# A function to create a compressed tarball of a directory in the current
+# folder, if there's sufficient space
+# ----------------------------------------------------------------------------
+targz() {
+  d="${1}"
+  if [ -d "${d}" ]
+  then
+    if [ $(stat -f --printf="%a * %s / 1024\n" . | bc) -gt $(du -sk ./"${d}" | awk '{print $1}') ]
+    then
+      tar cvfz "${d}.tgz" "${d}"
+    else
+      echo "Low space in $(pwd)"
+    fi
+  else
+    echo "Can't access ${d}"
+  fi
+}
+
+# Running this will then produce folder.tgz in your home directory
+# cd ~ && targz folder
+
+# ----------------------------------------------------------------------------
+# The following function would rsync stuff from the specified source to the
+# target with all the common and useful options.
+# ----------------------------------------------------------------------------
+myrsync() {
+  s="${1}"
+  t="${2}"
+  if [ -d "${s}" ]
+  then
+    if [ ! -d "${t}" ]
+    then
+      echo "Creating target ${t}"
+      mkdir -p "${t}"
+    fi
+    echo "Checking the size of ${s}"
+    if [ $(du -sk "${s}" | awk '{print $1}') -lt \
+    $(df -k "${t}" | sed 's/ \+/ /g' | grep -oP "(?<= )[0-9]{1,}(?= [0-9]{2}%)") ]
+    then
+      rsync -avuKxh --progress --log-file="$(mktemp)" "${s}" "${t}"
+    else
+      echo "Low space in ${t}"
+    fi
+  else
+    echo "Can't access ${s}"
+  fi
+}
+
+# An example of how to run the `myrsync` function:
+# myrsync /etc /opt/backups/$(date +'%Y-%m-%d_%H%M%S')
+
+# ----------------------------------------------------------------------------
+# Here's a function to find files in the source directory that
+# match the specified filename mask and rsync them to another folder:
+# ----------------------------------------------------------------------------
+find-rsync() {
+  s="${1}"
+  t="${2}"
+  m="${3}"
+  if [ -d "${s}" ] && [ ! -z "${m// }" ]
+  then
+    if [ ! -d "${t}" ]
+    then
+      echo "Creating target ${t}"
+      mkdir -p "${t}"
+    fi
+    find "${s}" -type f -name "${m}" -print0 | \
+    rsync -avKx --relative --files-from=- --from0 / "${t}"
+  else
+    echo "Can't access ${s} or filename mask is not set"
+  fi
+}
+
+# An example of how to run the `find-rsync` function to copy all `*.conf` files from /etc to a backup folder:
+# find-rsync /etc /opt/backups/$(date +'%Y-%m-%d_%H%M%S') "*\.conf"
+
+# ----------------------------------------------------------------------------
+# Find all RAR archives in the current folder and extract only certain
+# types of files from them:
+# ----------------------------------------------------------------------------
+unrar-here2() {
+  t="${1}"
+  if [ ! -z "${t}" ]
+  then
+    find . -maxdepth 1 -mindepth 1 -type f -name "*\.rar" -exec \
+    unrar e -kb -o+ {} \
+    $(for i in $(echo ${t} | sed 's/,/ /g')
+    do echo -ne "*.$i "
+    done) \;
+  fi
+}
+
+# Here's how this would work to extract common video filetypes
+# unrar-here2 "mkv,mp4,avi"
+
+# ----------------------------------------------------------------------------
+# Extract an archive file by running the correct command base on the
+# filename extension
+# ----------------------------------------------------------------------------
+extract () {
+  if [ -f "${1}" ] ; then
+    case $1 in
+      *.tar.bz2)  tar xjf    "${1}"    ;;
+      *.tar.gz)   tar xzf    "${1}"    ;;
+      *.bz2)      bunzip2    "${1}"    ;;
+      *.rar)      rar x      "${1}"    ;;
+      *.gz)       gunzip     "${1}"    ;;
+      *.tar)      tar xf     "${1}"    ;;
+      *.tbz2)     tar xjf    "${1}"    ;;
+      *.tgz)      tar xzf    "${1}"    ;;
+      *.zip)      unzip      "${1}"    ;;
+      *.Z)        uncompress "${1}"    ;;
+      *)      echo "Unknown file type" ;;
+    esac
+  else
+    echo "Can't access ${1}"
+  fi
+}
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |System Management Shortcuts                                                 |
+# |This is a short list of aliases and functions I have in my .bashrc for      |
+# |everyday sysadmin tasks.                                                    |
+# +---------------------------------------------------------------------------*/
+# Show total allocated local disk space
+dfalloc() {
+  df -klP -t xfs -t ext2 -t ext3 -t ext4 -t reiserfs | \
+  grep -oE ' [0-9]{1,}( +[0-9]{1,})+' | \
+  awk '{sum_used += $1} END {printf "%.0f GB\n", sum_used/1024/1024}'
+}
+
+# Show total used local disk space
+dfused() {
+  df -klP -t xfs -t ext2 -t ext3 -t ext4 -t reiserfs | \
+  grep -oE ' [0-9]{1,}( +[0-9]{1,})+' | \
+  awk '{sum_used += $2} END {printf "%.0f GB\n", sum_used/1024/1024}'
+}
+
+# Show total available allocated local disk space
+dffree() {
+  df -klP -t xfs -t ext2 -t ext3 -t ext4 -t reiserfs | \
+  grep -oE ' [0-9]{1,}( +[0-9]{1,})+' | \
+  awk '{sum_used += $3} END {printf "%.0f GB\n", sum_used/1024/1024}'
+}
+
+# Find largest files
+findhuge() {
+  f="${1}"
+  if [ -z "${f}" ]
+  then
+    f="$(awk '{print $2}' <(grep "^/dev" /etc/mtab))"
+  fi
+  l="${2}"; if [ -z "${l}" ]; then l=10; fi
+  h=$(echo ${HOSTNAME} | awk -F. '{print $1}')
+  d=$(date +'%Y-%m-%d %H:%M:%S')
+  for i in ${f}; do
+    find "${i}" -xdev -printf "${d},${h},%s,%TY-%Tm-%Td_%TH:%TM,%u:%g,%m,%n,%p\n" | \
+    sort -t, -k3rn | head -${l}
+  done | (echo "DATE,HOST,KB,MTIME,UID:GID,RWX,HL,PATH" && cat) | column -s',' -t
+}
+# Example:
+# findhuge /opt 10
+
+# Monitor filesystem space and file size changes in real time
+fswatch() {
+  target_dir="${1}"
+  filename_mask="${2}"
+  max_file_age="${3}"
+  max_count="${4}"
+  watch -d -n 5 "df -kP; echo;
+  find \"${target_dir}\" -maxdepth 2 -mindepth 1 -type f -name \"${filename_mask}*\" \
+  -newermt \"-${max_file_age} seconds\" -exec ls -FlAt {} \; | \
+  sort -k9V | column -t | head -${max_count}"
+}
+# Example:
+# fswatch /var/log "*" 10 20
+
+# Find the number of physical CPUs (even if hyper-threading is enabled)
+alias corecount="lscpu -p | egrep -v '^#' | sort -u -t, -k 2,4 | wc -l"
+
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Handy Network Aliases                                                       |
+# |I may not need to use these often, but when I do, I am usually in a hurry   |
+# |and have no time for googling.                                              |
+# +---------------------------------------------------------------------------*/
+# Show local primary IP address
+alias localip='ifconfig | sed -rn "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
+
+# Show public (Internet) IP address
+alias publicip='wget http://ipecho.net/plain -O - -q ; echo'
+
+# Scan subnet for active systems
+subnetscan() {
+  nmap -sn ${1} -oG - | awk '$4=="Status:" && $5=="Up" {print $2}'
+}
+# Example:
+# subnetscan 192.168.122.1/24
+
+# Scan subnet for available IPs
+subnetfree() {
+  nmap -v -sn -n ${1} -oG - | awk '/Status: Down/{print $2}'
+}
+# Example:
+# subnetfree 192.168.122.1/24
+
+# Quick network port scan of an IP
+portscan() {
+  nmap -oG -T4 -F ${1} | grep "\bopen\b"
+}
+# Example:
+# portscan 192.168.122.37
+
+# Stealth syn scan, OS and version detection, verbose output
+portscan-stealth() {
+  nmap -v -sV -O -sS -T5 ${1}
+}
+# Examples:
+# portscan-stealth 192.168.122.137
+# portscan-stealth 192.168.122.1/24
+
+# Test port connection
+alias portcheck='nc -v -i1 -w1'
+# Example:
+# portcheck 192.168.122.137 22
+
+# Detect frame drops using `ping`
+pingdrops() {
+  ping ${1} | \
+  grep -oP --line-buffered "(?<=icmp_seq=)[0-9]{1,}(?= )" | \ awk '$1!=p+1{print p+1"-"$1-1}{p=$1}' } # Example: pingdrops 192.168.122.137 # Quickly test network throughput between two servers via SSH bandwidth-test() { yes | pv | ssh ${1} "cat > /dev/null"
+}
+# Example:
+# bandwidth-test 192.168.122.137
+
+# Identify local listening ports and services
+localports() {
+  for i in $(lsof -i -P -n | grep -oP '(?<=\*:)[0-9]{2,}(?= \(LISTEN)' | sort -nu)
+  do
+    lsof -i :${i} | grep -v COMMAND | awk -v i=$i '{print $1,$3,i}' | sort -u
+  done | column -t
+}
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
