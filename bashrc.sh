@@ -147,10 +147,13 @@ alias ddf='df -hP | column -t'
 
 # ----------------------------------------------------------------------------
 # The `fc` function I mentioned earlier can help you determine which commands
-# you type most often. Some of those minght be good candidates for an alias.
+# you type most often. Some of those minght be good candidates for an alias or
+# a function.
 # ----------------------------------------------------------------------------
 alias g='grep -i'
-alias psg='ps -ef | grep '
+psg() {
+  ps -ef | grep $(echo "$@" | sed -r 's/(^\s*.)/[\1]/g')
+}
 
 # ----------------------------------------------------------------------------
 # This are probably the two most useful aliases for the `ls` command
