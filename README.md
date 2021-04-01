@@ -1,3 +1,5 @@
+![alt text](https://bashlogo.com/img/logo/png/full_colored_light.png)
+
 # Productivity Shortcuts for .bashrc
 
 Some of the useful (more or less) aliases and functions for the .bashrc file to make your life a little easier and delay the onset of carpal tunnel syndrome.
