@@ -81,11 +81,11 @@ alias hidetracks='cat /dev/null > ~/.bash_history && history -c && exit'
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
-# |Liquid Prompt — a useful adaptive prompt for Bash & zsh. Liquid Prompt    |
+# |Liquid Prompt — a useful adaptive prompt for Bash & zsh. Liquid Prompt      |
 # |gives you a nicely displayed prompt with useful information when you        |
 # |need it. It shows you what you need when you need it. You will notice       |
 # |what changes when it changes, saving time and frustration. You can even     |
-# |use it with your favorite shell – Bash or zsh.                            |
+# |use it with your favorite shell – Bash or zsh.                              |
 # |https://github.com/nojhan/liquidprompt                                      |
 # |                                                                            |
 # |INSTALLATION:                                                               |
@@ -182,6 +182,11 @@ alias ...='cd ../../'
 alias nano='nano -wET 2'
 
 # ----------------------------------------------------------------------------
+# Sort output of `du` by size in human-readable format
+# ----------------------------------------------------------------------------
+alias ddu='du -h --max-depth=1 |sort -rh'
+
+# ----------------------------------------------------------------------------
 # If you're a fan of `tmux`, which I am, then a few simple aliases will can
 # save you a lot of typing over time
 # ----------------------------------------------------------------------------
@@ -218,6 +223,13 @@ filewipe() {
 }
 # Example:
 # filewipe 3 /var/log/messages.1
+
+# ----------------------------------------------------------------------------
+# Monitor file changes with an added timestamp
+# ----------------------------------------------------------------------------
+tailtime() {
+  tail -F "${1}" | awk '{now=strftime("%F %T%z\t");sub(/^/, now);print}'
+}
 
 # ----------------------------------------------------------------------------
 # My favorite `ssh` alias for running commands on remote servers as root
@@ -301,11 +313,17 @@ source /root/.autojump/etc/profile.d/autojump.sh
 # ----------------------------------------------------------------------------
 targz() {
   d="${1}"
+  t="$(pwd)"
   if [ -d "${d}" ]
   then
-    if [ $(stat -f --printf="%a * %s / 1024\n" . | bc) -gt $(du -sk ./"${d}" | awk '{print $1}') ]
+    cd "${d}"
+    f="${t}/$(pwd | sed -e 's@^/@@g' -e 's@/@_@g')_$(date +'%Y-%m-%d_%H%M%S').tgz"
+    if [ $(stat -f --printf="%a * %s / 1024\n" . | bc) -gt $(du -sk . | awk '{print $1}') ]
     then
-      tar cvfz "${d}.tgz" "${d}"
+      #tar cvfz "${d}.tgz" "${d}"
+      tar -cf - . | pv -s $(du -sb . | awk '{print $1}') | \
+      gzip > "${f}"
+      cd "${t}" && ls -alh "${f}" 2>/dev/null
     else
       echo "Low space in $(pwd)"
     fi
@@ -392,6 +410,36 @@ unrar-here2() {
 # unrar-here2 "mkv,mp4,avi"
 
 # ----------------------------------------------------------------------------
+# Find all RAR archives in the current folder and extract only certain
+# types of files from them:
+# ----------------------------------------------------------------------------
+tar-ssh() {
+  while getopts ":s:t:u:h:" opt
+  do
+          case ${opt} in
+                  s  ) s="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
+                  t  ) t="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
+                  u  ) u="${OPTARG}" ;;
+                  h  ) h="${OPTARG}" ;;
+                  \? ) echo "Unknown option: -$OPTARG" >&2; exit 1;;
+  :  ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
+  *  ) echo "Unimplemented option: -$OPTARG" >&2; exit 1;;
+          esac
+  done
+  shift $((OPTIND -1))
+  if [ ! -z "${s}" ] && [ ! -z "${t}" ] && [ ! -z "${u}" ] && [ ! -z "${h}" ]
+  then
+    f="${t}/$(hostname -s)_$(echo "${s}" | sed -e 's@^/@@g' -e 's@/@_@g')_$(date +'%Y-%m-%d_%H%M%S').tar.bz2"
+    tar jcpf - "${s}" 2>/dev/null | ssh ${u}@${h} "cat > \"${f}\""
+    echo "Remote archive created: ${h}:${f}"
+    ssh -qtT ${u}@${h} "ls -alh \"${f}\""
+  fi
+}
+# Example:
+# This will create an archive of /tmp in ncc1701:/var/tmp/<hostname>_tmp_<timestamp>.tar.bz2
+# tar-ssh -s /tmp/ -t /var/tmp -u root -h ncc1701
+
+# ----------------------------------------------------------------------------
 # Extract an archive file by running the correct command base on the
 # filename extension
 # ----------------------------------------------------------------------------
@@ -414,6 +462,47 @@ extract () {
     echo "Can't access ${1}"
   fi
 }
+
+# Use mysqldump to backup a database to a remote server via SSH. This requires
+# passwordless SSH and, optionally, passwordless sudo access on the remote
+# system
+mysqldump-ssh-backup() {
+  while getopts ":d:u:p:s:h:t:" opt
+  do
+    case ${opt} in
+      d  ) d="${OPTARG}" ;;
+      u  ) u="${OPTARG}" ;;
+      p  ) p="${OPTARG}" ;;
+      s  ) s="${OPTARG}" ;;
+      h  ) h="${OPTARG}" ;;
+      t  ) t="${OPTARG}" ;;
+      \? ) echo "Unknown option: -$OPTARG" >&2; exit 1;;
+      :  ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
+      *  ) echo "Unimplemented option: -$OPTARG" >&2; exit 1;;
+    esac
+  done
+  if [ -z "${u}" ]; then read -p "Enter DB username: " u; fi
+  if [ -z "${p}" ]; then read -p "Enter DB password for ${u}: " p; fi
+  if [ -z "${d}" ]; then mysql -u"${u}" -p"${p}" -e "show databases;"; read -p "Enter database name: " d; fi
+  if [ -z "${s}" ]; then read -p "Enter SSH username: " s; fi
+  if [ -z "${h}" ]; then read -p "Enter SSH host: " h; fi
+  if [ -z "${t}" ]; then read -p "Enter target folder on ${h}: " t; fi
+  log="${d}_error_$(date +'%Y-%m-%d_%H%M%S').log"
+  f="${d}.$(date +'%Y-%m-%d_%H%M%S').sql"
+  mysqldump -q --skip-opt --force --log-error="${log}" \
+  -u"${u}" -p"${p}" "${d}" | \
+  ssh -qtT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+  -o ConnectTimeout=3 -o BatchMode=yes \
+  "${s}"@"${h}" "sudo su - root -c 'mkdir -p "${t}"; cd "${t}"; cat > "${f}"; gzip "${f}"'" 2>/dev/null
+ }
+
+# Syntax:
+# mysqldump-ssh-backup [-u db_username ] [-p db_password] [-d db_name] \
+# [-s ssh_username] [-h ssh_host] [-t target_folder]
+#
+# Example:
+# mysqldump-ssh-backup -u root -d saltstackdb -s root -h ncc1701 -t /var/tmp
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
@@ -478,6 +567,74 @@ fswatch() {
 
 # Find the number of physical CPUs (even if hyper-threading is enabled)
 alias corecount="lscpu -p | egrep -v '^#' | sort -u -t, -k 2,4 | wc -l"
+
+# Watch memory usage
+alias memwatch='watch vmstat -sSM'
+
+# Search file contents for a string
+ff() { local IFS='|'; grep -rinE "$*" . ; }
+
+# A more useful output of `vmstat`
+vmstat1() {
+  vmstat $@ | ts '[%Y-%m-%d %H:%M:%S]'
+}
+
+# Search Google from command-line
+google() {
+  Q="$@"
+  GOOG_URL="http://www.google.com/search?q="
+  AGENT="Mozilla/4.0"
+  stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}\"${Q/\ /+}\"" | \
+  grep -oP '\/url\?q=.+?&amp' | sed 's/\/url?q=//;s/&amp//')
+  echo -e "${stream//\%/\x}"
+}
+
+# Generate a random alphanumeric file of certain size
+filegen() {
+  s="${1}"
+  if [ -z "${s}" ]; then s="1M"; fi
+  fsize="$(echo ${1} | grep -Eo '[0-9]{1,}')"
+  sunit="$(echo ${1} | grep -oE '[Aa-Zz]{1,}')"
+  (( ssize = fsize * 6 ))
+  f="${2}"
+  if [ -z "${f}" ] || [ -f "${f}" ]; then f="$(mktemp)"; fi
+  head -c "${fsize}${sunit}" <(head -c "${ssize}${sunit}" </dev/urandom | tr -dc A-Za-z0-9) > "${f}"
+  ls -alh "${f}"
+}
+# Example:
+# filegen 10M /var/tmp/10M_file.txt
+
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Output formatting                                                           |                                              |
+# +---------------------------------------------------------------------------*/
+# Print a full-width line separator
+rule () {
+	printf -v _hr "%*s" $(tput cols 2>/dev/null) && echo ${_hr// /${1--}}
+}
+
+# Print a horizontal line with a message
+rulem ()  {
+	if [ $# -eq 0 ]; then
+    echo "Usage: rulem MESSAGE [RULE_CHARACTER]"
+    return 1
+	fi
+	printf -v _hr "%*s" $(tput cols 2>/dev/null) && echo -en ${_hr// /${2--}} && echo -e "\r\033[2C$1"
+}
+
+# Convert to lowercase
+lower() { echo ${@,,}; }
+
+# Right-align text
+alias right="printf '%*s' $(tput cols 2>/dev/null)"
+# Example:
+# right "This is a test"
+
+# A better alternative to the `clear` command
+cls(){ printf "\33[2J";}
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
@@ -544,4 +701,44 @@ localports() {
     lsof -i :${i} | grep -v COMMAND | awk -v i=$i '{print $1,$3,i}' | sort -u
   done | column -t
 }
+
+# Use Curl to check URL connection performance
+urltest() {
+  URL="${@}"
+  if [ ! -z "${URL}" ]; then
+    curl -L --write-out "URL,DNS,conn,time,speed,size\n
+%{url_effective},%{time_namelookup} (s),%{time_connect} (s),%{time_total} (s),%{speed_download} (bps),%{size_download} (bytes)\n" \
+-o/dev/null -s "${URL}" | column -s, -t
+  fi
+}
+# Example:
+# urltest https://igoros.com
+
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Silly things                                                                |
+# +---------------------------------------------------------------------------*/
+
+# Show a random fact
+fact() {
+  wget randomfunfacts.com -O - 2>/dev/null | \
+  grep \<strong\> | sed "s;^.*<i>\(.*\)</i>.*$;\1;"
+}
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |DuckDuckGo Terminal App                                                     |
+# |ddgr is a cmdline utility to search DuckDuckGo from the terminal.           |
+# |                                                                            |
+# |Installation:                                                               |
+# |-------------                                                               |
+# |                                                                            |
+# |cd ~ && git clone https://github.com/jarun/ddgr.git && cd ddgr &&           |
+# |make install                                                                |
+# +---------------------------------------------------------------------------*/
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
