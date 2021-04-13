@@ -13,7 +13,7 @@
 # +---------------------------------------------------------------------------*/
 
 # /bin/cp -p ~/.bashrc ~/.bashrc_$(date +'%Y-%m-%d_%H%M%S') && \
-# curl -k -K -s0 https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh -o ~/.bashrc && \
+# curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
 # chmod 644 ~/.bashrc
 
 # Source global definitions
@@ -777,18 +777,32 @@ portproc() {
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
+#  _______________________________________________________
+# /\                                                      \
+# \_|  ____  _ _ _         _____ _     _                  |
+#   | / ___|(_) | |_   _  |_   _| |__ (_)_ __   __ _ ___  |
+#   | \___ \| | | | | | |   | | | '_ \| | '_ \ / _` / __| |
+#   |  ___) | | | | |_| |   | | | | | | | | | | (_| \__ \ |
+#   | |____/|_|_|_|\__, |   |_| |_| |_|_|_| |_|\__, |___/ |
+#   |              |___/                       |___/      |
+#   |   __________________________________________________|_
+#    \_/____________________________________________________/
+
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
-# |Silly things                                                                |
+# |Show a random fact                                                          |
+# |                                                                            |
+# |Installation:                                                               |
+# |-------------                                                               |
+# |                                                                            |
+# |Install optinal `boxes` and `coreutils` packages:                           |
+# |(apt|yum|dnf) install boxes coreutils                                       |
+# |                                                                            |
+# |Install optional `lolcat` package:                                          |
+# |pip install lolcat                                                          |
 # +---------------------------------------------------------------------------*/
 
-# Show a random fact
-# Install optinal `boxes` and `coreutils` packages:
-# (apt|yum|dnf) install boxes coreutils
-#
-# Install optional `lolcat` package:
-# pip install lolcat
 
 fact() {
   factx() {
@@ -825,6 +839,21 @@ duck() {
   else
     ddgr --noprompt --num 10 --expand "$@"
   fi
+}
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Source-highlight - convert source code to syntax highlighted document       |
+# |                                                                            |
+# |Installation:                                                               |
+# |-------------                                                               |
+# |                                                                            |
+# |yum -y install source-highlight                                             |
+# +---------------------------------------------------------------------------*/
+
+syntax() {
+  source-highlight -f esc256 -i "$@" | less -R
 }
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
