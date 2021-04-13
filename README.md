@@ -4,6 +4,8 @@
 
 Some of the useful (more or less) aliases and functions for the .bashrc file to make your life a little easier and delay the onset of carpal tunnel syndrome.
 
+Review the file carefully before you use it. Don't just copy/paste and then yell at me that you can't log in. There are some package dependencies. Also, certain command aliases require root access (this .bashrc I use for my root accounts), so you may want to wrap them in sudo. 
+
 ## Things to remove from .bashrc
 
 Few things annoy me more than these three default command aliases. Removing them is one of the first things I do after installing a new OS:
