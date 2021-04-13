@@ -12,6 +12,10 @@
 # |.bashrc I use for my root accounts), so you may want to wrap them in sudo.  |
 # +---------------------------------------------------------------------------*/
 
+# /bin/cp -p ~/.bashrc ~/.bashrc_$(date +'%Y-%m-%d_%H%M%S') && \
+# curl -k -K -s0 https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh -o ~/.bashrc && \
+# chmod 644 ~/.bashrc
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
         . /etc/bashrc
