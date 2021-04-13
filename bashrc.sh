@@ -1,4 +1,16 @@
 # .bashrc
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Some of the useful (more or less) aliases and functions for the .bashrc     |
+# |file to make your life a little easier and delay the onset of carpal        |
+# |tunnel syndrome.                                                            |
+# |                                                                            |
+# |Review the file carefully before you use it. Don't just copy/paste          |
+# |and then yell at me that you can't log in. There are some package           |
+# |dependencies. Also, certain command aliases require root access (this       |
+# |.bashrc I use for my root accounts), so you may want to wrap them in sudo.  |
+# +---------------------------------------------------------------------------*/
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -116,6 +128,22 @@ eval $(dircolors -b)
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 # ----------------------------------------------------------------------------
+# Find broken links x levels deep
+# ----------------------------------------------------------------------------
+brokenlinks() {
+ d="${1}"
+ if [ -z "${d}" ]; then d="$(pwd)"; fi
+ l="${2}"
+ if [ -z "${l}" ]; then l="1"; fi
+ find "${d}" -mindepth 1 -maxdepth ${l} -type l ! -exec test -e {} \; -print
+}
+# Syntax:
+# brokenlinks [/path] [depth]
+#
+# Example:
+# brokenlinks /usr/bin 2
+
+# ----------------------------------------------------------------------------
 # Correcting common typos
 # ----------------------------------------------------------------------------
 alias grpe='grep'
@@ -156,7 +184,7 @@ psg() {
 }
 
 # ----------------------------------------------------------------------------
-# This are probably the two most useful aliases for the `ls` command
+# These are probably the two most useful aliases for the `ls` command
 # ----------------------------------------------------------------------------
 alias l='ls -CF --color=always'
 alias ll='ls -alhF --color=always'
@@ -173,6 +201,20 @@ alias ccd='cd -P'
 # ----------------------------------------------------------------------------
 alias ..='cd ..'
 alias ...='cd ../../'
+
+# ----------------------------------------------------------------------------
+# Merge lines ending with '\'
+# ----------------------------------------------------------------------------
+mg() {
+  sed  '
+: again
+/\\$/ {
+    N
+    s/\\\n//
+    t again
+}
+' "${1}"
+}
 
 # ----------------------------------------------------------------------------
 # I don't normally use `nano`, but here is an alias sysadmins would find
@@ -410,8 +452,8 @@ unrar-here2() {
 # unrar-here2 "mkv,mp4,avi"
 
 # ----------------------------------------------------------------------------
-# Find all RAR archives in the current folder and extract only certain
-# types of files from them:
+# Create a compressed tarball of a local directory and place it on a remote
+# server
 # ----------------------------------------------------------------------------
 tar-ssh() {
   while getopts ":s:t:u:h:" opt
@@ -440,7 +482,7 @@ tar-ssh() {
 # tar-ssh -s /tmp/ -t /var/tmp -u root -h ncc1701
 
 # ----------------------------------------------------------------------------
-# Extract an archive file by running the correct command base on the
+# Extract an archive file by running the correct command based on the
 # filename extension
 # ----------------------------------------------------------------------------
 extract () {
@@ -714,6 +756,21 @@ urltest() {
 # Example:
 # urltest https://igoros.com
 
+# List processes associated with a port
+portproc() {
+  port="${1}"
+  if [ ! -z "${port}" ]
+  then
+    for proto in tcp udp
+    do
+      for pid in $(fuser ${port}/${proto} 2>/dev/null | awk -F: '{print $NF}')
+      do
+        ps -eo user,pid,lstart,cmd | awk -v pid=$pid '$2 == pid'
+      done
+    done
+  fi
+}
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
@@ -723,9 +780,26 @@ urltest() {
 # +---------------------------------------------------------------------------*/
 
 # Show a random fact
+# Install optinal `boxes` and `coreutils` packages:
+# (apt|yum|dnf) install boxes coreutils
+#
+# Install optional `lolcat` package:
+# pip install lolcat
+
 fact() {
-  wget randomfunfacts.com -O - 2>/dev/null | \
-  grep \<strong\> | sed "s;^.*<i>\(.*\)</i>.*$;\1;"
+  factx() {
+    wget randomfunfacts.com -O - 2>/dev/null | \
+    grep \<strong\> | sed "s;^.*<i>\(.*\)</i>.*$;\1;"
+  }
+  if hash fmt boxes lolcat 2>/dev/null; then
+    factx | fmt -s -w 48 | boxes -d peek -a l -s 79 | lolcat
+  elif hash fmt boxes 2>/dev/null; then
+    factx | fmt -s -w 48 | boxes -d peek -a l -s 79
+  elif hash fmt 2>/dev/null; then
+    factx | fmt -s -w 48
+  else
+    factx
+  fi
 }
 
 #/*       _\|/_
@@ -740,5 +814,13 @@ fact() {
 # |cd ~ && git clone https://github.com/jarun/ddgr.git && cd ddgr &&           |
 # |make install                                                                |
 # +---------------------------------------------------------------------------*/
+
+duck() {
+  if hash fmt 2>/dev/null; then
+    ddgr --noprompt --num 10 --expand "$@" | fmt -s -w 79
+  else
+    ddgr --noprompt --num 10 --expand "$@"
+  fi
+}
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
