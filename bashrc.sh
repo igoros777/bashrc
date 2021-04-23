@@ -14,7 +14,7 @@
 
 # /bin/cp -p ~/.bashrc ~/.bashrc_$(date +'%Y-%m-%d_%H%M%S') && \
 # curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
-# chmod 644 ~/.bashrc
+# chmod 644 ~/.bashrc && source ~/.bashrc
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -125,7 +125,7 @@ alias hidetracks='cat /dev/null > ~/.bash_history && history -c && exit'
 # |                                                                            |
 # |INSTALLATION:                                                               |
 # |-------------                                                               |
-# |curl http://url.igoros.com/570 > ~/.bliss.dircolors                         |
+# |curl -L http://url.igoros.com/570 > ~/.bliss.dircolors                         |
 # +---------------------------------------------------------------------------*/
 [ -e ~/.bliss.dircolors ] && eval $(dircolors -b ~/.bliss.dircolors) || \
 eval $(dircolors -b)
