@@ -183,9 +183,23 @@ alias ddf='df -hP | column -t'
 # a function.
 # ----------------------------------------------------------------------------
 alias g='grep -i'
+
+# A handy alias for the `ps -ef | grep something | grep -v grep` thing
+# All you need to type is `psg something` and it will translate to
+# `ps -ef | grep [s]omething` and this will exclude `grep` itself
 psg() {
   ps -ef | grep $(echo "$@" | sed -r 's/(^\s*.)/[\1]/g')
 }
+
+# Highlight search terms in files or command output
+spot() {
+  ack --passthru $@
+}
+
+# Example:
+# netstat -tuna | spot ESTABLISHED
+# netstat -tuna | spot -i established
+# spot local /etc/hosts
 
 # ----------------------------------------------------------------------------
 # These are probably the two most useful aliases for the `ls` command
@@ -222,7 +236,7 @@ mg() {
 
 # ----------------------------------------------------------------------------
 # I don't normally use `nano`, but here is an alias sysadmins would find
-# useful. It disabled long line wrapping, converts tabs to spaces, and sets
+# useful. It disables long line wrapping, converts tabs to spaces, and sets
 # the width of a tab to 2 columns instead of the default 8.
 # ----------------------------------------------------------------------------
 alias nano='nano -wET 2'
@@ -245,7 +259,8 @@ alias tk='tmux kill-session -s'                               # kill session
 # ----------------------------------------------------------------------------
 # Generate a strong password
 # ----------------------------------------------------------------------------
-alias newpass="cat /dev/urandom | tr -dc 'a-zA-Z0-9^#@_:|<>{}=+$%' | fold -w ${1:-32} | head -n 1"
+alias newpass="cat /dev/urandom | tr -dc 'a-zA-Z0-9^#@_:|<>{}=+$%' | \
+fold -w ${1:-32} | head -n 1"
 
 # ----------------------------------------------------------------------------
 # Securely delete a file. There are better and faster tools, but this will
@@ -735,7 +750,15 @@ alias portcheck='nc -v -i1 -w1'
 # Detect frame drops using `ping`
 pingdrops() {
   ping ${1} | \
-  grep -oP --line-buffered "(?<=icmp_seq=)[0-9]{1,}(?= )" | \ awk '$1!=p+1{print p+1"-"$1-1}{p=$1}' } # Example: pingdrops 192.168.122.137 # Quickly test network throughput between two servers via SSH bandwidth-test() { yes | pv | ssh ${1} "cat > /dev/null"
+  grep -oP --line-buffered "(?<=icmp_seq=)[0-9]{1,}(?= )" | \
+  awk '$1!=p+1{print p+1"-"$1-1}{p=$1}'
+}
+# Example:
+# pingdrops 192.168.122.137
+
+# Quickly test network throughput between two servers via SSH
+bandwidth-test() {
+  yes | pv | ssh ${1} "cat > /dev/null"
 }
 # Example:
 # bandwidth-test 192.168.122.137
