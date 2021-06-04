@@ -477,15 +477,15 @@ unrar-here2() {
 tar-ssh() {
   while getopts ":s:t:u:h:" opt
   do
-          case ${opt} in
-                  s  ) s="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
-                  t  ) t="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
-                  u  ) u="${OPTARG}" ;;
-                  h  ) h="${OPTARG}" ;;
-                  \? ) echo "Unknown option: -$OPTARG" >&2; exit 1;;
-  :  ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
-  *  ) echo "Unimplemented option: -$OPTARG" >&2; exit 1;;
-          esac
+    case ${opt} in
+      s  ) s="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
+      t  ) t="$(echo ${OPTARG} | sed 's@/$@@g')" ;;
+      u  ) u="${OPTARG}" ;;
+      h  ) h="${OPTARG}" ;;
+      \? ) echo "Unknown option: -$OPTARG" >&2; exit 1;;
+      :  ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
+      *  ) echo "Unimplemented option: -$OPTARG" >&2; exit 1;;
+    esac
   done
   shift $((OPTIND -1))
   if [ ! -z "${s}" ] && [ ! -z "${t}" ] && [ ! -z "${u}" ] && [ ! -z "${h}" ]
@@ -506,7 +506,7 @@ tar-ssh() {
 # ----------------------------------------------------------------------------
 extract () {
   if [ -f "${1}" ] ; then
-    case $1 in
+    case "${1}" in
       *.tar.bz2)  tar xjf    "${1}"    ;;
       *.tar.gz)   tar xzf    "${1}"    ;;
       *.bz2)      bunzip2    "${1}"    ;;
@@ -654,8 +654,8 @@ google() {
 filegen() {
   s="${1}"
   if [ -z "${s}" ]; then s="1M"; fi
-  fsize="$(echo ${1} | grep -Eo '[0-9]{1,}')"
-  sunit="$(echo ${1} | grep -oE '[Aa-Zz]{1,}')"
+  fsize="$(echo ${s} | grep -Eo '[0-9]{1,}')"
+  sunit="$(echo ${s} | grep -oE '[Aa-Zz]{1,}')"
   (( ssize = fsize * 6 ))
   f="${2}"
   if [ -z "${f}" ] || [ -f "${f}" ]; then f="$(mktemp)"; fi
