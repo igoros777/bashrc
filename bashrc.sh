@@ -293,6 +293,19 @@ tailtime() {
 }
 
 # ----------------------------------------------------------------------------
+# Find the first and the last occurrences of an error message in the logs
+# ----------------------------------------------------------------------------
+errorframe() {
+  zgrep -h "${3}" $(find "${1}" -mindepth 1 -maxdepth 1 -type f \
+  -name "${2}*" | sort -V | sed '1,1{H;1h;d;};$G') | sed -n '1p;$p'
+}
+
+# Find the first and last occurrences of "NT_STATUS_END_OF_FILE" error in
+# /var/log/messages*
+#
+# errorframe /var/log messages "NT_STATUS_END_OF_FILE"
+
+# ----------------------------------------------------------------------------
 # My favorite `ssh` alias for running commands on remote servers as root
 # ----------------------------------------------------------------------------
 3s() {
