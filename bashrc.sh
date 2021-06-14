@@ -877,6 +877,9 @@ duck() {
   fi
 }
 
+# Example:
+# duck "search phrase"
+
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
@@ -891,5 +894,24 @@ duck() {
 syntax() {
   source-highlight -f esc256 -i "$@" | less -R
 }
+
+# Example:
+# syntax some_script.sh
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |TLDR - show online help and examples for Linux shell commands               |
+# |                                                                            |
+# |Installation:                                                               |
+# |-------------                                                               |
+# |                                                                            |
+# |npm install -g tldr                                                         |
+# +---------------------------------------------------------------------------*/
+
+alias help='/usr/bin/tldr'
+
+# Example:
+# help rsync
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
