@@ -973,5 +973,20 @@ EOF
 
 bind '"4~":"shelp\n"'
 
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |asciinema is a popular tool for recording your terminal window sessions so  |
+# |that you can share them with others. asciinema is fairly easy to install on |
+# |modern Linux versions. If you have an older system, I have some notes that  |
+# |may be of help: https://www.igoroseledko.com/asciinema-notes/               |
+# |The function below is convenient as I can never remember the proper syntax  |
+# |to use with asciinema.                                                      |
+# +---------------------------------------------------------------------------*/
+
+record() {
+  asciinema rec --stdin --overwrite -t \
+  "$(hostname | awk -F. '{print $1}')_$(date +'%Y-%m-%d_%H%M%S')" -i 3 -y -q
+}
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
