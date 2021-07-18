@@ -16,10 +16,32 @@
 # curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
 # chmod 644 ~/.bashrc && source ~/.bashrc
 
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Liquid Prompt — a useful adaptive prompt for Bash & zsh. Liquid Prompt      |
+# |gives you a nicely displayed prompt with useful information when you        |
+# |need it. It shows you what you need when you need it. You will notice       |
+# |what changes when it changes, saving time and frustration. You can even     |
+# |use it with your favorite shell – Bash or zsh.                              |
+# |https://github.com/nojhan/liquidprompt                                      |
+# |                                                                            |
+# |INSTALLATION:                                                               |
+# |-------------                                                               |
+# |cd ~ && git clone https://github.com/nojhan/liquidprompt.git                |
+# +---------------------------------------------------------------------------*/
+[[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
         . /etc/bashrc
 fi
+
+# Adds a timestamp to the prompt, which can be useful when scrolling through
+# the console history to find something you did earlier in the session
+export PROMPT_COMMAND="echo -n \$(date +'%b %_d, %H:%M')\ "
 
 # User specific aliases and functions
 
@@ -92,23 +114,6 @@ fc() {
 # Clear history and log out
 alias hidetracks='cat /dev/null > ~/.bash_history && history -c && exit'
 
-#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
-
-#/*       _\|/_
-#         (o o)
-# +----oOO-{_}-OOo-------------------------------------------------------------+
-# |Liquid Prompt — a useful adaptive prompt for Bash & zsh. Liquid Prompt      |
-# |gives you a nicely displayed prompt with useful information when you        |
-# |need it. It shows you what you need when you need it. You will notice       |
-# |what changes when it changes, saving time and frustration. You can even     |
-# |use it with your favorite shell – Bash or zsh.                              |
-# |https://github.com/nojhan/liquidprompt                                      |
-# |                                                                            |
-# |INSTALLATION:                                                               |
-# |-------------                                                               |
-# |cd ~ && git clone https://github.com/nojhan/liquidprompt.git                |
-# +---------------------------------------------------------------------------*/
-[[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
