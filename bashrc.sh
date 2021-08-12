@@ -153,6 +153,19 @@ brokenlinks() {
 # brokenlinks /usr/bin 2
 
 # ----------------------------------------------------------------------------
+# Clear pagecache, dentries, inodes, and swap. Note: this may cause problems
+# on a busy server and is not recommended on a production system - especially
+# a database server.
+# ----------------------------------------------------------------------------
+memclear() {
+  free -h
+  echo 3 > /proc/sys/vm/drop_caches && \
+  swapoff -a && \
+  swapon -a && \
+  free -h
+}
+
+# ----------------------------------------------------------------------------
 # Correcting common typos
 # ----------------------------------------------------------------------------
 alias grpe='grep'
