@@ -114,6 +114,21 @@ fc() {
 # Clear history and log out
 alias hidetracks='cat /dev/null > ~/.bash_history && history -c && exit'
 
+# ----------------------------------------------------------------------------
+# Automatically back up files when editing them in VIM
+# See more here: https://www.igoroseledko.com/automatic-file-backups-in-vim/
+# ----------------------------------------------------------------------------
+vish() {
+  for f in "${@}"
+  do
+    if [ -f "${f}" ]
+    then
+      /bin/cp -p "${f}" "$(dirname "${f}")/$(basename -- "${f%.*}")_$(date -d @$(stat -c %Y "${f}") +'%Y-%m-%d_%H%M%S')@$(date +'%Y-%m-%d_%H%M%S')$([[ "${f}" = *.* ]] && echo ".${f##*.}" || echo '')"
+    fi
+  done
+  exec vim "${@}"
+}
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
