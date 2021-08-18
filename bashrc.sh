@@ -119,14 +119,29 @@ alias hidetracks='cat /dev/null > ~/.bash_history && history -c && exit'
 # See more here: https://www.igoroseledko.com/automatic-file-backups-in-vim/
 # ----------------------------------------------------------------------------
 vish() {
+  declare -a a an
+  i=0
   for f in "${@}"
   do
     if [ -f "${f}" ]
     then
-      /bin/cp -p "${f}" "$(dirname "${f}")/$(basename -- "${f%.*}")_$(date -d @$(stat -c %Y "${f}") +'%Y-%m-%d_%H%M%S')@$(date +'%Y-%m-%d_%H%M%S')$([[ "${f}" = *.* ]] && echo ".${f##*.}" || echo '')"
+      fn="$(dirname "${f}")/$(basename -- "${f%.*}")_$(date -d @$(stat -c %Y "${f}") +'%Y-%m-%d_%H%M%S')@$(date +'%Y-%m-%d_%H%M%S')$([[ "${f}" = *.* ]] && echo ".${f##*.}" || echo '')"
+      a+=("${f}")
+      an+=("${fn}")
+      /bin/cp -p "${a[$i]}" "${an[$i]}"
+      (( i = i + 1 ))
     fi
   done
   vim "${@}"
+  if [ $? -eq 0 ]; then
+    for ((i = 0; i < ${#a[@]}; i++))
+    do
+      if cmp -s "${a[$i]}" "${an[$i]}"
+      then
+        /bin/rm -f "${an[$i]}" 2>/dev/null
+      fi
+    done
+  fi
 }
 
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
