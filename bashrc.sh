@@ -48,6 +48,16 @@ fi
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Don't worry about these aliases - these are just for me. Feel free to       |
+# |comment them out.                                                           |
+# +---------------------------------------------------------------------------*/
+post() {
+     hashtag post || { sleep 600 && hashtag post || { sleep 600 && hashtag post; } }
+ }
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
 # |Bash history format                                                         |
 # +---------------------------------------------------------------------------*/
 export HISTTIMEFORMAT='| %F %T | '
@@ -1019,7 +1029,7 @@ EOF
 # that's what I used. Your terminal emulator may be different, so just hit F12,
 # see what you get, and insert that string in place of my "4~".
 
-bind '"4~":"shelp\n"'
+tty=$(tty); [[ $tty != "not a tty" ]] && bind '"4~":"shelp\n"'
 
 #/*       _\|/_
 #         (o o)
