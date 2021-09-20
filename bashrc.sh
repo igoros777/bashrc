@@ -38,6 +38,23 @@
 # +---------------------------------------------------------------------------*/
 [[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
 
+#   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# | Tab completion for Git branch names                                        |
+# +---------------------------------------------------------------------------*/
+# |                                                                            |
+# |INSTALLATION:                                                               |
+# |-------------                                                               |
+# |curl https://raw.githubusercontent.com/git/git/master/contrib/completion/\  |
+# |git-completion.bash -o ~/.git-completion.bash                               |
+# +---------------------------------------------------------------------------*/
+if [ -f "~/.git-completion.bash" ] && [ -f "~/.gitconfig" ]; then
+  source "~/.git-completion.bash"
+fi
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
         . /etc/bashrc
@@ -54,6 +71,25 @@ fi
 post() {
      hashtag post || { sleep 600 && hashtag post || { sleep 600 && hashtag post; } }
  }
+
+roj() {
+  cd /mnt/nas04/backups/igor/documents/Aeternus/GitHub/igoros777
+}
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
+# | Git aliases                                                                |
+# +---------------------------------------------------------------------------*/
+alias gdf="git diff"
+alias gitap="git add -p"
+alias gitc="git commit -m"
+alias gits="git status"
+alias gco="git checkout"
+alias gul="git pull"
+alias gush="git push"
+alias gbra="git branch"
+alias glog="git log --pretty=format:'%h - %an: %s' --graph"
 
 #/*       _\|/_
 #         (o o)
