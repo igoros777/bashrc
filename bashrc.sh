@@ -90,7 +90,6 @@ alias gul="git pull"
 alias gush="git push"
 alias gbra="git branch"
 alias glog="git log --pretty=format:'%h - %an: %s' --graph"
-
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
