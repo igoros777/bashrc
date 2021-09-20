@@ -72,8 +72,20 @@ post() {
      hashtag post || { sleep 600 && hashtag post || { sleep 600 && hashtag post; } }
  }
 
-roj() {
-  cd /mnt/nas04/backups/igor/documents/Aeternus/GitHub/igoros777
+photo() {
+  /mnt/nas04/backups/igor/documents/Aeternus/Photography
+}
+
+function gitdo() {
+  gdir="/mnt/c/zip/aeternus/GitHub/igoros777"
+  if [ ! -z "${1}" ] && [ -d "${gdir}" ] && [ -d "${gdir}/${1}" ]; then
+    cd "${gdir}"
+    cd "${1}"
+  	git add .
+  	git status
+  	git commit -am "`date +'%Y-%m-%d_%H%M%S'`"
+  	git push
+  fi
 }
 
 #/*       _\|/_
