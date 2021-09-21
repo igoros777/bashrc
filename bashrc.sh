@@ -16,6 +16,7 @@
 # curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
 # chmod 644 ~/.bashrc && source ~/.bashrc
 
+
 # Adds a timestamp to the prompt, which can be useful when scrolling through
 # the console history to find something you did earlier in the session
 # export PROMPT_COMMAND="echo -n \$(date +'%b %_d, %H:%M')\ "
