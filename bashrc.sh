@@ -73,7 +73,7 @@ post() {
      hashtag post || { sleep 600 && hashtag post || { sleep 600 && hashtag post; } }
      if [ $(which atjobs 2>/dev/null 1>&2; echo $?) -eq 0 ]
      then
-       atrm $(atjobs | grep "Are you a robot" | awk '{print $1}')
+       atrm $(atjobs | grep "Are you a robot" | awk '{print $1}') 2>/dev/null 1>&2
      fi
  }
 
