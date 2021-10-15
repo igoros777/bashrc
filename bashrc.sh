@@ -78,7 +78,7 @@ post() {
  }
 
 photo() {
-  /mnt/nas04/backups/igor/documents/Aeternus/Photography
+  cd "/mnt/nas04/backups/igor/documents/Aeternus/Photography"
 }
 
 function gitdo() {
@@ -91,6 +91,31 @@ function gitdo() {
   	git commit -am "`date +'%Y-%m-%d_%H%M%S'`"
   	git push
   fi
+}
+
+privacy_on() {
+  # Disable Bash history
+  unset HISTFILE
+  set +o history
+  f=$(mktemp)
+  history | tail -2 | awk '{print $1}' | sort -rn > ${f}
+  for j in $(cat ${f}); do history -d ${j}; done
+  /bin/rm -f ${f}
+
+  # Block outbound port 514 typically used by rsyslog
+  tc filter add dev $(route | grep -m1 ^default | awk '{print $NF}') parent 1: pref 1 protocol ip basic match '
+  (cmp (u8 at 9 layer network eq 6) or cmp (u8 at 9 layer network eq 17)) and
+  cmp(u16 at 2 layer transport eq 514)' action drop
+}
+
+privacy_off() {
+  # Remove port 514 block
+  tc filter del dev $(route | grep -m1 ^default | awk '{print $NF}') parent 1: pref 1 protocol ip basic match '
+  (cmp (u8 at 9 layer network eq 6) or cmp (u8 at 9 layer network eq 17)) and
+  cmp(u16 at 2 layer transport eq 514)' action drop
+
+  # Re-enable Bash history
+  set -o history
 }
 
 #/*       _\|/_
