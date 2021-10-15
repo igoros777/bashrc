@@ -16,7 +16,6 @@
 # curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
 # chmod 644 ~/.bashrc && source ~/.bashrc
 
-
 # Adds a timestamp to the prompt, which can be useful when scrolling through
 # the console history to find something you did earlier in the session
 # export PROMPT_COMMAND="echo -n \$(date +'%b %_d, %H:%M')\ "
@@ -305,13 +304,14 @@ confirm() {
   response=${response,,}
   if [[ "$response" =~ ^(yes|y)$ ]]
   then
-    eval "${c}"
+    eval "/sbin/${c}"
   else
     :
   fi
 }
 alias reboot='confirm reboot'
 alias shutdown='confirm shutdown'
+alias poweroff='confirm poweroff'
 
 # ----------------------------------------------------------------------------
 # This produces output similar to `df -hP` but a little easier to follow
