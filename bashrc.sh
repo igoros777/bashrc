@@ -118,6 +118,11 @@ privacy_off() {
   set -o history
 }
 
+privacy_check() {
+  tc filter show dev $(route | grep -m1 ^default | awk '{print $NF}')
+  tc -s -d qdisc show dev $(route | grep -m1 ^default | awk '{print $NF}')
+}
+
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
