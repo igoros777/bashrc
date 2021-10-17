@@ -80,6 +80,12 @@ photo() {
   cd "/mnt/nas04/backups/igor/documents/Aeternus/Photography"
 }
 
+bashrcpull() {
+  /bin/cp -p ~/.bashrc ~/.bashrc_$(date +'%Y-%m-%d_%H%M%S') && \
+  curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
+  chmod 644 ~/.bashrc && source ~/.bashrc
+}
+
 function gitdo() {
   gdir="/mnt/c/zip/aeternus/GitHub/igoros777"
   if [ ! -z "${1}" ] && [ -d "${gdir}" ] && [ -d "${gdir}/${1}" ]; then
