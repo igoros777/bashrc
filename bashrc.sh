@@ -16,6 +16,25 @@
 # curl -q "https://raw.githubusercontent.com/igoros777/bashrc/main/bashrc.sh" -o ~/.bashrc && \
 # chmod 644 ~/.bashrc && source ~/.bashrc
 
+# +---------------------------------------------------------------------------*/
+# Some of the shortcuts and aliases rely on additional software packages. To
+# simplify the installation of this .bashrc, here's the list of everything you
+# need to have installed:
+
+# [ -n "$(command -v apt-get)" ] && \
+# apt install -y curl boxes coreutils moreutils source-highlight|| \
+# yum install -y curl boxes coreutils moreutils source-highlight
+# pip install lolcat
+# npm install -g tldr
+# cd ~ && git clone https://github.com/nojhan/liquidprompt.git
+# [[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
+# curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
+# curl -L http://url.igoros.com/570 > ~/.bliss.dircolors
+# cd ~ && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && echo y | ~/.fzf/install
+# cd ~ && git clone git://github.com/wting/autojump.git && cd autojump && ./install.py
+# cd ~ && git clone https://github.com/jarun/ddgr.git && cd ddgr && make install
+# +---------------------------------------------------------------------------*/
+
 # Adds a timestamp to the prompt, which can be useful when scrolling through
 # the console history to find something you did earlier in the session
 # export PROMPT_COMMAND="echo -n \$(date +'%b %_d, %H:%M')\ "
@@ -391,7 +410,7 @@ alias nano='nano -wET 2'
 # ----------------------------------------------------------------------------
 # Sort output of `du` by size in human-readable format
 # ----------------------------------------------------------------------------
-alias ddu='du -h --max-depth=1 |sort -rh'
+alias ddu='du -h --max-depth=1 | sort -rh'
 
 # ----------------------------------------------------------------------------
 # If you're a fan of `tmux`, which I am, then a few simple aliases will can
