@@ -1083,6 +1083,16 @@ alias help='/usr/bin/tldr'
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
+# |Weather forecast for your location. Use your zip code or city name for      |
+# |greater accuracy, otherwise the server will try to guess your location      |
+# |based on your IPs address, which may not always work correctly.             |
+# +---------------------------------------------------------------------------*/
+
+alias weather='curl http://wttr.in/19701'
+
+#/*       _\|/_
+#         (o o)
+# +----oOO-{_}-OOo-------------------------------------------------------------+
 # |Show keyboard showrtcuts for bash productivity                              |
 # +---------------------------------------------------------------------------*/
 
