@@ -25,6 +25,7 @@
 # apt install -y curl boxes coreutils moreutils source-highlight|| \
 # yum install -y curl boxes coreutils moreutils source-highlight
 # pip install lolcat
+# npm config set strict-ssl false
 # npm install -g tldr
 # cd ~ && git clone https://github.com/nojhan/liquidprompt.git
 # [[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
