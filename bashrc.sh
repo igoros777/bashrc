@@ -809,26 +809,35 @@ fswatch() {
 # Find the number of physical CPUs (even if hyper-threading is enabled)
 alias corecount="lscpu -p | egrep -v '^#' | sort -u -t, -k 2,4 | wc -l"
 
-# Watch memory usage
-alias memwatch='watch vmstat -sSM'
+# Watch memory usage in real time
+alias memwatch='watch -d vmstat -sSM'
 
-# Search file contents for a string
+# Search contents of files in the current directory for the specified string
 ff() { local IFS='|'; grep -rinE "$*" . ; }
 
-# A more useful output of `vmstat`
+# Example:
+# cd /etc && ff localhost
+
+# A more useful output of `vmstat` with a timestamp. This imitates the `-t`
+# flag available with the most recent versions of `vmstat`
 vmstat1() {
   vmstat $@ | ts '[%Y-%m-%d %H:%M:%S]'
 }
+
+# Example:
+# vmstat1 2 10
 
 # Search Google from command-line
 google() {
   Q="$@"
   GOOG_URL="http://www.google.com/search?q="
   AGENT="Mozilla/4.0"
-  stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}\"${Q/\ /+}\"" | \
+  stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}\"${Q//\ /+}\"" | \
   grep -oP '\/url\?q=.+?&amp' | sed 's/\/url?q=//;s/&amp//')
   echo -e "${stream//\%/\x}"
 }
+
+# Example: google to be or not to be
 
 # Generate a random alphanumeric file of certain size
 filegen() {
@@ -857,6 +866,9 @@ rule () {
 	printf -v _hr "%*s" $(tput cols 2>/dev/null) && echo ${_hr// /${1--}}
 }
 
+# Example:
+# date; rule; uptime
+
 # Print a horizontal line with a message
 rulem ()  {
 	if [ $# -eq 0 ]; then
@@ -866,11 +878,18 @@ rulem ()  {
 	printf -v _hr "%*s" $(tput cols 2>/dev/null) && echo -en ${_hr// /${2--}} && echo -e "\r\033[2C$1"
 }
 
+# Example:
+# date; rulem "line break" -; uptime
+
 # Convert to lowercase
 lower() { echo ${@,,}; }
 
+# Example:
+# lower THIS is a TEST
+
 # Right-align text
-alias right="printf '%*s' $(tput cols 2>/dev/null)"
+alias right="printf '%*s\n' $(tput cols 2>/dev/null)"
+
 # Example:
 # right "This is a test"
 
@@ -897,6 +916,7 @@ alias publicip='wget http://ipecho.net/plain -O - -q ; echo'
 subnetscan() {
   nmap -sn ${1} -oG - | awk '$4=="Status:" && $5=="Up" {print $2}'
 }
+
 # Example:
 # subnetscan 192.168.122.1/24
 
@@ -904,6 +924,7 @@ subnetscan() {
 subnetfree() {
   nmap -v -sn -n ${1} -oG - | awk '/Status: Down/{print $2}'
 }
+
 # Example:
 # subnetfree 192.168.122.1/24
 
@@ -911,6 +932,7 @@ subnetfree() {
 portscan() {
   nmap -oG -T4 -F ${1} | grep "\bopen\b"
 }
+
 # Example:
 # portscan 192.168.122.37
 
@@ -918,12 +940,14 @@ portscan() {
 portscan-stealth() {
   nmap -v -sV -O -sS -T5 ${1}
 }
+
 # Examples:
 # portscan-stealth 192.168.122.137
 # portscan-stealth 192.168.122.1/24
 
 # Test port connection
 alias portcheck='nc -v -i1 -w1'
+
 # Example:
 # portcheck 192.168.122.137 22
 
@@ -933,6 +957,7 @@ pingdrops() {
   grep -oP --line-buffered "(?<=icmp_seq=)[0-9]{1,}(?= )" | \
   awk '$1!=p+1{print p+1"-"$1-1}{p=$1}'
 }
+
 # Example:
 # pingdrops 192.168.122.137
 
@@ -940,6 +965,7 @@ pingdrops() {
 bandwidth-test() {
   yes | pv | ssh ${1} "cat > /dev/null"
 }
+
 # Example:
 # bandwidth-test 192.168.122.137
 
@@ -960,6 +986,7 @@ urltest() {
 -o/dev/null -s "${URL}" | column -s, -t
   fi
 }
+
 # Example:
 # urltest https://igoros.com
 
@@ -1013,11 +1040,11 @@ fact() {
     grep \<strong\> | sed "s;^.*<i>\(.*\)</i>.*$;\1;"
   }
   if hash fmt boxes lolcat 2>/dev/null; then
-    factx | fmt -s -w 48 | boxes -d peek -a l -s 79 | lolcat
+    factx | fmt -s -w 70 | boxes -d peek -a l -s 79 | lolcat
   elif hash fmt boxes 2>/dev/null; then
-    factx | fmt -s -w 48 | boxes -d peek -a l -s 79
+    factx | fmt -s -w 70 | boxes -d peek -a l -s 79
   elif hash fmt 2>/dev/null; then
-    factx | fmt -s -w 48
+    factx | fmt -s -w 70
   else
     factx
   fi
