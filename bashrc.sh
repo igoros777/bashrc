@@ -89,11 +89,16 @@ fi
 # |comment them out.                                                           |
 # +---------------------------------------------------------------------------*/
 post() {
-     hashtag post || { sleep 600 && hashtag post || { sleep 600 && hashtag post; } }
-     if [ $(which atjobs 2>/dev/null 1>&2; echo $?) -eq 0 ]
-     then
-       atrm $(atjobs | grep "Are you a robot" | awk '{print $1}') 2>/dev/null 1>&2
-     fi
+  if [ ! -z "${1}" ]; then
+    tstart=${1}
+  else
+    tstart=1
+  fi
+   hashtag post ${tstart} || { sleep 600 && hashtag post ${tstart} || { sleep 600 && hashtag post ${tstart}; } }
+   if [ $(which atjobs 2>/dev/null 1>&2; echo $?) -eq 0 ]
+   then
+     atrm $(atjobs | grep "Are you a robot" | awk '{print $1}') 2>/dev/null 1>&2
+   fi
  }
 
 photo() {
