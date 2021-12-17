@@ -325,6 +325,11 @@ alias grpe='grep'
 alias hsitory='history'
 alias sl='ls'
 alias cd..='cd ..'
+alias sd='df'
+alias la='ls'
+alias pwe='pwd'
+alias cdc='cd'
+alias dcd='cd'
 
 # ----------------------------------------------------------------------------
 # Avoiding stupid mistakes
