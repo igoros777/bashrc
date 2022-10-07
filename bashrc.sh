@@ -22,9 +22,9 @@
 # need to have installed:
 
 # [ -n "$(command -v apt-get)" ] && \
-# apt install -y curl boxes coreutils moreutils source-highlight|| \
-# yum install -y curl boxes coreutils moreutils source-highlight
-# pip install lolcat
+# apt install -y curl coreutils moreutils source-highlight python2-pip python3-pip npm || \
+# yum install -y curl coreutils moreutils source-highlight python2-pip python3-pip npm
+# pip install lolcat boxes
 # npm config set strict-ssl false
 # npm install -g tldr
 # cd ~ && git clone https://github.com/nojhan/liquidprompt.git
@@ -32,7 +32,8 @@
 # curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
 # curl -L http://url.igoros.com/570 > ~/.bliss.dircolors
 # cd ~ && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && echo y | ~/.fzf/install
-# cd ~ && git clone git://github.com/wting/autojump.git && cd autojump && ./install.py
+# cd ~ && git clone https://igoros777@github.com/igoros777/autojump.git && cd autojump && ./install.py
+# echo "[[ -s /root/.autojump/etc/profile.d/autojump.sh ]] && source /root/.autojump/etc/profile.d/autojump.sh" >> ~/.bashrc
 # cd ~ && git clone https://github.com/jarun/ddgr.git && cd ddgr && make install
 # +---------------------------------------------------------------------------*/
 
