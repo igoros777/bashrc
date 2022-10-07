@@ -41,6 +41,8 @@
 # the console history to find something you did earlier in the session
 # export PROMPT_COMMAND="echo -n \$(date +'%b %_d, %H:%M')\ "
 
+PS1="\[\e]0;\u: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\] [\D{%a %b %d, %H:%M}]:\[\033[01;34m\]\w\[\033[00m\] # "
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
