@@ -43,6 +43,10 @@
 
 PS1="\[\e]0;\u: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\] [\D{%a %b %d, %H:%M}]:\[\033[01;34m\]\w\[\033[00m\] # "
 
+# A good way to set your DISPLAY variable
+export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+export LIBGL_ALWAYS_INDIRECT=1
+
 #   _,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,__,.-'~'-.,
 
 #/*       _\|/_
@@ -503,6 +507,11 @@ export EDITOR=vi
 export VISUAL=vi
 alias nloader="/usr/bin/nload -i 500000 -o 500000 -u MB \
 $(route | grep -m1 ^default | awk '{print $NF}')"
+
+if type rg &> /dev/null; then
+  export FZF_DEFAULT_COMMAND='rg --files'
+  export FZF_DEFAULT_OPTS="-m --height 50% --border --preview 'bat --color=always {}'"
+fi
 
 #/*       _\|/_
 #         (o o)
@@ -1188,7 +1197,7 @@ EOF
 # that's what I used. Your terminal emulator may be different, so just hit F12,
 # see what you get, and insert that string in place of my "4~".
 
-tty=$(tty); [[ $tty != "not a tty" ]] && bind '"4~":"shelp\n"'
+# tty=$(tty); [[ $tty != "not a tty" ]] && bind '"4~":"shelp\n"'
 
 #/*       _\|/_
 #         (o o)
