@@ -140,16 +140,19 @@ privacy_on() {
   /bin/rm -f ${f}
 
   # Block outbound port 514 typically used by rsyslog
+  # Create the root qdisc
+  tc qdisc add dev $(route | grep -m1 ^default | awk '{print $NF}') root handle 1: htb
+
+  # Add the filter as a child of that qdisc
   tc filter add dev $(route | grep -m1 ^default | awk '{print $NF}') parent 1: pref 1 protocol ip basic match '
-  (cmp (u8 at 9 layer network eq 6) or cmp (u8 at 9 layer network eq 17)) and
-  cmp(u16 at 2 layer transport eq 514)' action drop
+    (cmp (u8 at 9 layer network eq 6) or cmp (u8 at 9 layer network eq 17)) and
+    cmp(u16 at 2 layer transport eq 514)' action drop
+
 }
 
 privacy_off() {
   # Remove port 514 block
-  tc filter del dev $(route | grep -m1 ^default | awk '{print $NF}') parent 1: pref 1 protocol ip basic match '
-  (cmp (u8 at 9 layer network eq 6) or cmp (u8 at 9 layer network eq 17)) and
-  cmp(u16 at 2 layer transport eq 514)' action drop
+  tc qdisc del dev $(route | grep -m1 ^default | awk '{print $NF}') root
 
   # Re-enable Bash history
   set -o history
