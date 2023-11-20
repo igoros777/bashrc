@@ -163,6 +163,11 @@ privacy_check() {
   tc -s -d qdisc show dev $(route | grep -m1 ^default | awk '{print $NF}')
 }
 
+# Shows the time of last reboot
+lastboot() {
+  date -d "$(who -b | awk '{print $3,$4}')" +"%Y-%m-%d %H:%M:%S"
+}
+
 #/*       _\|/_
 #         (o o)
 # +----oOO-{_}-OOo-------------------------------------------------------------+
