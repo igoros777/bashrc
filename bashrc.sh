@@ -22,8 +22,8 @@
 # need to have installed:
 
 # [ -n "$(command -v apt-get)" ] && \
-# apt install -y curl coreutils moreutils source-highlight python2-pip python3-pip npm || \
-# yum install -y curl coreutils moreutils source-highlight python2-pip python3-pip npm
+# apt install -y curl coreutils moreutils source-highlight python-pip python3-pip npm || \
+# yum install -y curl coreutils moreutils source-highlight python-pip python3-pip npm
 # pip install lolcat boxes
 # npm config set strict-ssl false
 # npm install -g tldr
